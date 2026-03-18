@@ -1,0 +1,145 @@
+.sizes-sheet {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(255, 250, 244, 0.9);
+  box-shadow: 0 20px 45px rgba(88, 52, 23, 0.12);
+}
+
+.sizes-sheet__header {
+  margin-bottom: 24px;
+}
+
+.sizes-sheet__eyebrow {
+  margin: 0 0 8px;
+  color: #9f5c2c;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sizes-sheet__header h2 {
+  margin: 0;
+  color: #2f2419;
+  font-size: 2.2rem;
+}
+
+.sizes-sheet__copy {
+  margin: 12px 0 0;
+  color: #6f5a45;
+  line-height: 1.7;
+}
+
+.sizes-sheet__actions {
+  margin-bottom: 20px;
+}
+
+.sizes-sheet__button {
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #9f5c2c;
+  color: #fffaf5;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(159, 92, 44, 0.22);
+}
+
+.sizes-sheet__button:hover {
+  background: #7d441d;
+}
+
+.sizes-sheet__button-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.sizes-sheet__table-wrap {
+  overflow-x: auto;
+}
+
+.sizes-sheet__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sizes-sheet__table th,
+.sizes-sheet__table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(122, 83, 38, 0.14);
+  text-align: left;
+}
+
+.sizes-sheet__table th {
+  color: #7d441d;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.sizes-sheet__table td {
+  color: #3f2d1e;
+}
+
+.sizes-sheet__input {
+  width: 100%;
+  min-width: 180px;
+  padding: 10px 12px;
+  border: 1px solid rgba(122, 83, 38, 0.22);
+  border-radius: 10px;
+  outline: none;
+}
+
+.sizes-sheet__input:focus {
+  border-color: #9f5c2c;
+  box-shadow: 0 0 0 3px rgba(159, 92, 44, 0.14);
+}
+
+.sizes-sheet__totals {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  color: #3f2d1e;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.sizes-sheet__bill {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(122, 83, 38, 0.14);
+}
+
+.sizes-sheet__bill h3 {
+  margin: 0 0 16px;
+  color: #2f2419;
+  font-size: 1.8rem;
+}
+
+.sizes-sheet__bill-name {
+  margin-bottom: 20px;
+}
+
+.sizes-sheet__label {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #7d441d;
+  font-weight: 700;
+}
+
+.sizes-sheet__grand-totals {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(159, 92, 44, 0.08);
+  color: #2f2419;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.sizes-sheet__submit {
+  margin-top: 20px;
+}

@@ -1,0 +1,77 @@
+.recent-bills {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(255, 250, 244, 0.9);
+  box-shadow: 0 20px 45px rgba(88, 52, 23, 0.12);
+}
+
+.recent-bills__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.recent-bills__header h2 {
+  margin: 0;
+  color: #2f2419;
+  font-size: 2rem;
+}
+
+.recent-bills__header p {
+  margin: 8px 0 0;
+  color: #6f5a45;
+}
+
+.recent-bills__back,
+.recent-bills__actions button {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #9f5c2c;
+  color: #fffaf5;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.recent-bills__list {
+  display: grid;
+  gap: 16px;
+}
+
+.recent-bills__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 20px;
+  border: 1px solid rgba(122, 83, 38, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.recent-bills__item h3 {
+  margin: 0;
+  color: #2f2419;
+}
+
+.recent-bills__item p {
+  margin: 6px 0 0;
+  color: #6f5a45;
+}
+
+.recent-bills__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.recent-bills__empty {
+  padding: 32px 0;
+  text-align: center;
+  color: #6f5a45;
+}

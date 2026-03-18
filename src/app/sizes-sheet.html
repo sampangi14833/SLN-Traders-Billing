@@ -1,0 +1,193 @@
+<section class="sizes-sheet">
+  <header class="sizes-sheet__header">
+    <h2>Sizes Sheet</h2>
+  </header>
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a class="sizes-sheet__button sizes-sheet__button-link" routerLink="/">Home</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="sizes-sheet__button" type="button" (click)="openLargeSize()">
+      Large Sizes
+    </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="sizes-sheet__button" type="button" (click)="openSmallSize()">
+      Small Sizes
+    </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="sizes-sheet__button" type="button" (click)="generateBill()">
+      Generate Bill
+    </button>
+  </div>
+
+  @if (activeSizeGroup === 'large') {
+    <p class="sizes-sheet__copy">
+      Enter stone groups like <strong>1+5+7+10</strong>. The page will total them
+      automatically and fill the stone count for that large size.
+    </p>
+    <div class="sizes-sheet__table-wrap">
+      <table class="sizes-sheet__table">
+        <thead>
+          <tr>
+            <th>Size</th>
+            <th>No.of Stones</th>
+            <th>Stones Count</th>
+            <th>Total Area</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of largeRows; track row.size) {
+            <tr>
+              <td>{{ row.size }}</td>
+              <td>
+                <input
+                  class="sizes-sheet__input"
+                  type="text"
+                  [(ngModel)]="row.stoneExpression"
+                  placeholder="Enter the stones"
+                />
+              </td>
+              <td>{{ getStoneCount(row) }}</td>
+              <td>{{ getTotalArea(row) | number: '1.0-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="sizes-sheet__totals">
+      <p><strong>Total Stones:</strong> {{ getLargeTotalStones() }}</p>
+      <p><strong>Total Area:</strong> {{ getLargeTotalArea() | number: '1.0-2' }}</p>
+    </div>
+  }
+
+  @if (activeSizeGroup === 'small') {
+    <p class="sizes-sheet__copy">
+      Enter stone groups like <strong>1+5+7+10</strong>. The page will total them
+      automatically and fill the stone count for that small size.
+    </p>
+    <div class="sizes-sheet__table-wrap">
+      <table class="sizes-sheet__table">
+        <thead>
+          <tr>
+            <th>Size</th>
+            <th>No.of Stones</th>
+            <th>Stones Count</th>
+            <th>Total Area</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of smallRows; track row.size) {
+            <tr>
+              <td>{{ row.size }}</td>
+              <td>
+                <input
+                  class="sizes-sheet__input"
+                  type="text"
+                  [(ngModel)]="row.stoneExpression"
+                  placeholder="Enter the stones"
+                />
+              </td>
+              <td>{{ getStoneCount(row) }}</td>
+              <td>{{ getTotalArea(row) | number: '1.0-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+    </div>
+    <div class="sizes-sheet__totals">
+      <p><strong>Total Stones:</strong> {{ getSmallTotalStones() }}</p>
+      <p><strong>Total Area:</strong> {{ getSmallTotalArea() | number: '1.0-2' }}</p>
+    </div>
+  }
+
+  @if (showGeneratedBill) {
+    <section class="sizes-sheet__bill">
+      <h3>Generated Bill</h3>
+
+      <div class="sizes-sheet__bill-name">
+        <label class="sizes-sheet__label" for="bill-name">Bill Name</label>
+        <input
+          id="bill-name"
+          class="sizes-sheet__input"
+          type="text"
+          [(ngModel)]="billName"
+          placeholder="Enter bill name"
+        />
+      </div>
+
+      <div class="sizes-sheet__bill-name">
+        <label class="sizes-sheet__label" for="lorry-number">Lorry Number</label>
+        <input
+          id="lorry-number"
+          class="sizes-sheet__input"
+          type="text"
+          [(ngModel)]="lorryNumber"
+          placeholder="Enter lorry number"
+        />
+      </div>
+
+      <p class="sizes-sheet__copy">Large Sizes Summary</p>
+      <div class="sizes-sheet__table-wrap">
+        <table class="sizes-sheet__table">
+          <thead>
+            <tr>
+              <th>Size</th>
+              <th>No.of Stones</th>
+              <th>Stones Count</th>
+              <th>Total Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of largeRows; track row.size) {
+              <tr>
+                <td>{{ row.size }}</td>
+                <td>{{ row.stoneExpression || '-' }}</td>
+                <td>{{ getStoneCount(row) }}</td>
+                <td>{{ getTotalArea(row) | number: '1.0-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="sizes-sheet__totals">
+        <p><strong>Total Stones:</strong> {{ getLargeTotalStones() }}</p>
+        <p><strong>Total Area:</strong> {{ getLargeTotalArea() | number: '1.0-2' }}</p>
+      </div>
+
+      <p class="sizes-sheet__copy">Small Sizes Summary</p>
+      <div class="sizes-sheet__table-wrap">
+        <table class="sizes-sheet__table">
+          <thead>
+            <tr>
+              <th>Size</th>
+              <th>No.of Stones</th>
+              <th>Stones Count</th>
+              <th>Total Area</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of smallRows; track row.size) {
+              <tr>
+                <td>{{ row.size }}</td>
+                <td>{{ row.stoneExpression || '-' }}</td>
+                <td>{{ getStoneCount(row) }}</td>
+                <td>{{ getTotalArea(row) | number: '1.0-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="sizes-sheet__totals">
+        <p><strong>Total Stones:</strong> {{ getSmallTotalStones() }}</p>
+        <p><strong>Total Area:</strong> {{ getSmallTotalArea() | number: '1.0-2' }}</p>
+      </div>
+
+      <div class="sizes-sheet__grand-totals">
+        <p><strong>Total Stones:</strong> {{ getGeneratedTotalStones() }}</p>
+        <p><strong>Total Area:</strong> {{ getGeneratedTotalArea() | number: '1.0-2' }}</p>
+      </div>
+
+      <div class="sizes-sheet__submit">
+        <button class="sizes-sheet__button" type="button" (click)="submitBill()">
+          Submit
+        </button>
+      </div>
+    </section>
+  }
+</section>

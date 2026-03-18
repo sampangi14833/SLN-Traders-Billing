@@ -1,0 +1,31 @@
+<section class="recent-bills">
+  <div class="recent-bills__header">
+    <div>
+      <h2>Recent Bills</h2>
+      <p>Saved bills from the submit action are listed here.</p>
+    </div>
+    <a class="recent-bills__back" routerLink="/">Back Home</a>
+  </div>
+
+  @if (bills.length === 0) {
+    <div class="recent-bills__empty">
+      <p>No bills have been submitted yet.</p>
+    </div>
+  } @else {
+    <div class="recent-bills__list">
+      @for (bill of bills; track bill.id) {
+        <article class="recent-bills__item">
+          <div>
+            <h3>{{ bill.title }}</h3>
+            <p>{{ bill.createdAt }}</p>
+          </div>
+          <div class="recent-bills__actions">
+            <button type="button" (click)="viewBill(bill.html)">View</button>
+            <button type="button" (click)="downloadBill(bill.html)">Download</button>
+            <button type="button" (click)="deleteBill(bill.id)">Delete</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
