@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.auth-page--register .auth-panel__layer--back {
+  background:
+    linear-gradient(145deg, rgba(91, 146, 103, 0.14), rgba(255, 240, 218, 0.44)),
+    rgba(255, 250, 244, 0.38);
+}
+
+.auth-page--register .auth-panel__layer--mid {
+  background:
+    linear-gradient(145deg, rgba(255, 246, 236, 0.94), rgba(209, 224, 195, 0.34)),
+    rgba(255, 255, 255, 0.64);
+}
+
+.auth-page--register .auth-card {
+  max-width: 540px;
+}
+
+.auth-page--register .auth-status {
+  margin-bottom: 4px;
+}
+
+.auth-page--register .auth-switch {
+  margin-top: 22px;
+}

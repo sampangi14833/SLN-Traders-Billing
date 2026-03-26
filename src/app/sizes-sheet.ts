@@ -328,7 +328,7 @@ export class SizesSheet {
           </style>
         </head>
         <body>
-          <h1>SLN Billing Generated Bill</h1>
+          <h1>SNL Enterprises</h1>
           <p class="bill-name"><strong>Bill Name:</strong> ${this.billName.trim() || 'Untitled Bill'}</p>
           <p class="bill-meta"><strong>Lorry Number:</strong> ${this.lorryNumber.trim() || '-'}</p>
           <p class="intro">Widths 2, 1.5, 1, 9, 1.25 and 6 are shown below.</p>

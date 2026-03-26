@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { SizesSheet } from './sizes-sheet';
 
 describe('SizesSheet', () => {
@@ -7,7 +8,7 @@ describe('SizesSheet', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SizesSheet]
+      imports: [SizesSheet, RouterTestingModule]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SizesSheet);

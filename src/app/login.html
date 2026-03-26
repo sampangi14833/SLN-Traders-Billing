@@ -1,0 +1,166 @@
+<section class="auth-page auth-page--login">
+  <div class="auth-stage">
+    <aside class="auth-aside">
+      <p class="auth-badge">SNL Traders Billing</p>
+      <h1 class="auth-brand">Secure billing for Marble operations.</h1>
+      <p class="auth-lead">
+        Sign in to manage size sheets, generate bills, and review invoice history
+        from one workspace designed for your stone business.
+      </p>
+
+      <ul class="auth-points">
+        <li>
+          <span class="auth-point-title">Protected access</span>
+          <span class="auth-point-copy">
+            Login stays focused and clear while the form feels elevated instead of flat.
+          </span>
+        </li>
+        <li>
+          <span class="auth-point-title">Billing-first workflow</span>
+          <span class="auth-point-copy">
+            Sizes, recent bills, and account recovery remain only a few actions away.
+          </span>
+        </li>
+      </ul>
+
+      <div class="auth-metrics">
+        <article>
+          <strong>Management:</strong>
+          <span>Kondaiahgari Sreenivasulu (Founder)</span>
+          <span>Nagalakshumamma (Co-Founder)</span>
+        </article>
+        <article>
+          <strong>Contact:</strong>
+          <span>Mobile: +91 9849255291</span>
+          <span>Email: sampangisuman6@gmail.com</span>
+        </article>
+      </div>
+    </aside>
+
+    <div class="auth-panel">
+      <span class="auth-panel__halo" aria-hidden="true"></span>
+      <div class="auth-panel__layer auth-panel__layer--back" aria-hidden="true"></div>
+      <div class="auth-panel__layer auth-panel__layer--mid" aria-hidden="true"></div>
+
+      <section class="auth-card" aria-labelledby="login-title">
+        <p class="auth-eyebrow">Secure Access</p>
+        <h2 class="auth-heading" id="login-title">Login to your workspace</h2>
+        <p class="auth-subtitle">
+          Use your registered email and password to continue into the billing dashboard.
+        </p>
+
+        <div
+          *ngIf="message"
+          class="auth-alert"
+          [class.auth-alert--error]="isError"
+          [class.auth-alert--success]="!isError"
+        >
+          {{ message }}
+        </div>
+
+        <div class="auth-form-grid">
+          <label class="auth-field">
+            <span>Email</span>
+            <input
+              type="email"
+              class="auth-input"
+              [(ngModel)]="data.email"
+              placeholder="Enter email ID"
+              autocomplete="email"
+            />
+          </label>
+
+          <label class="auth-field">
+            <span>Password</span>
+            <input
+              type="password"
+              class="auth-input"
+              [(ngModel)]="data.password"
+              placeholder="Enter password"
+              autocomplete="current-password"
+            />
+          </label>
+        </div>
+
+        <div class="auth-actions">
+          <button type="button" class="auth-primary" (click)="login()">Login</button>
+        </div>
+
+        <div class="auth-switch">
+          <span>Need a new account?</span>
+          <a class="auth-inline-link" routerLink="/register">Create account</a>
+        </div>
+
+        <hr class="auth-divider" />
+
+        <div class="auth-actions">
+          <button type="button" class="auth-ghost" (click)="toggleForgotPassword()">
+            {{ forgotMode ? 'Close password reset' : 'Forgot password?' }}
+          </button>
+        </div>
+
+        <section *ngIf="forgotMode" class="auth-reset">
+          <h3 class="auth-section-title">Reset password</h3>
+          <p class="auth-section-copy">
+            We'll verify your registered email with OTP before saving the new password.
+          </p>
+
+          <div *ngIf="!otpSent" class="auth-form-grid">
+            <label class="auth-field">
+              <span>Registered Email</span>
+              <input
+                type="email"
+                class="auth-input"
+                [(ngModel)]="forgotEmail"
+                placeholder="Enter registered email ID"
+                autocomplete="email"
+              />
+            </label>
+
+            <button type="button" class="auth-secondary" (click)="sendForgotOtp()">
+              Send OTP
+            </button>
+          </div>
+
+          <div *ngIf="otpSent">
+            <p class="auth-note">OTP sent successfully. Enter the code and your new password.</p>
+
+            <div class="auth-form-grid">
+              <label class="auth-field">
+                <span>Registered Email</span>
+                <input
+                  type="email"
+                  class="auth-input"
+                  [(ngModel)]="forgotEmail"
+                  readonly
+                />
+              </label>
+
+              <label class="auth-field">
+                <span>OTP</span>
+                <input class="auth-input" [(ngModel)]="otp" placeholder="Enter OTP" />
+              </label>
+
+              <label class="auth-field">
+                <span>New Password</span>
+                <input
+                  type="password"
+                  class="auth-input"
+                  [(ngModel)]="newPassword"
+                  placeholder="Enter new password"
+                  autocomplete="new-password"
+                />
+              </label>
+            </div>
+
+            <div class="auth-actions">
+              <button type="button" class="auth-primary" (click)="resetPassword()">
+                Reset Password
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </div>
+</section>

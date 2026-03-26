@@ -1,0 +1,129 @@
+<section class="auth-page auth-page--register">
+  <div class="auth-stage">
+    <aside class="auth-aside">
+      <p class="auth-badge">New Account Setup</p>
+      <h1 class="auth-brand">Create a verified billing account.</h1>
+      <p class="auth-lead">
+        Registration is simple: confirm the email with OTP, add operator details,
+        and start using the billing workspace immediately.
+      </p>
+
+      <ul class="auth-process">
+        <li>
+          <span class="auth-process-step" data-step="1">Enter business email</span>
+          <span class="auth-process-copy">
+            The account begins with a registered email address used for access and recovery.
+          </span>
+        </li>
+        <li>
+          <span class="auth-process-step" data-step="2">Verify with OTP</span>
+          <span class="auth-process-copy">
+            OTP confirmation prevents invalid registrations and keeps the system controlled.
+          </span>
+        </li>
+        <li>
+          <span class="auth-process-step" data-step="3">Set user details</span>
+          <span class="auth-process-copy">
+            Add the operator name and password once the email is confirmed successfully.
+          </span>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="auth-panel">
+      <span class="auth-panel__halo" aria-hidden="true"></span>
+      <div class="auth-panel__layer auth-panel__layer--back" aria-hidden="true"></div>
+      <div class="auth-panel__layer auth-panel__layer--mid" aria-hidden="true"></div>
+
+      <section class="auth-card" aria-labelledby="register-title">
+        <p class="auth-eyebrow">Registration</p>
+        <h2 class="auth-heading" id="register-title">Open your billing account</h2>
+        <p class="auth-subtitle">
+          Complete the OTP step first, then finish the account setup with your name and password.
+        </p>
+
+        <div
+          *ngIf="message"
+          class="auth-alert"
+          [class.auth-alert--error]="isError"
+          [class.auth-alert--success]="!isError"
+        >
+          {{ message }}
+        </div>
+
+        <div class="auth-form-grid">
+          <label class="auth-field">
+            <span>Email</span>
+            <input
+              type="email"
+              class="auth-input"
+              [(ngModel)]="email"
+              placeholder="Enter email ID"
+              autocomplete="email"
+            />
+          </label>
+        </div>
+
+        <div class="auth-actions">
+          <button type="button" class="auth-secondary" (click)="sendOtp()">Send OTP</button>
+        </div>
+
+        <div class="auth-form-grid">
+          <label class="auth-field">
+            <span>OTP</span>
+            <input
+              class="auth-input"
+              [(ngModel)]="otp"
+              placeholder="Enter recent OTP"
+              inputmode="numeric"
+            />
+          </label>
+        </div>
+
+        <div class="auth-actions">
+          <button type="button" class="auth-link-button" (click)="verifyOtp()">
+            Verify OTP
+          </button>
+        </div>
+
+        <div *ngIf="verified">
+          <div class="auth-status">Email verified</div>
+
+          <div class="auth-form-grid">
+            <label class="auth-field">
+              <span>Name</span>
+              <input
+                class="auth-input"
+                [(ngModel)]="user.name"
+                placeholder="Enter name"
+                autocomplete="name"
+              />
+            </label>
+
+            <label class="auth-field">
+              <span>Password</span>
+              <input
+                type="password"
+                class="auth-input"
+                [(ngModel)]="user.password"
+                placeholder="Enter password"
+                autocomplete="new-password"
+              />
+            </label>
+          </div>
+
+          <div class="auth-actions">
+            <button type="button" class="auth-primary" (click)="register()">
+              Register
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-switch">
+          <span>Already have an account?</span>
+          <a class="auth-inline-link" routerLink="/login">Back to login</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>

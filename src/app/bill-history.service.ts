@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { AuthService } from './auth.service';
 
 export type BillRecord = {
   id: string;
@@ -9,10 +10,11 @@ export type BillRecord = {
 
 @Injectable({ providedIn: 'root' })
 export class BillHistoryService {
-  private readonly storageKey = 'sln-billing-recent-bills';
+  private readonly auth = inject(AuthService);
+  private readonly storageKeyPrefix = 'sln-billing-recent-bills';
 
   getBills(): BillRecord[] {
-    const raw = localStorage.getItem(this.storageKey);
+    const raw = localStorage.getItem(this.getStorageKey());
 
     if (!raw) {
       return [];
@@ -36,14 +38,14 @@ export class BillHistoryService {
     };
 
     bills.unshift(bill);
-    localStorage.setItem(this.storageKey, JSON.stringify(bills.slice(0, 25)));
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(bills.slice(0, 25)));
 
     return bill;
   }
 
   deleteBill(id: string): BillRecord[] {
     const remainingBills = this.getBills().filter((bill) => bill.id !== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(remainingBills));
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(remainingBills));
 
     return remainingBills;
   }
@@ -63,5 +65,17 @@ export class BillHistoryService {
     if (print) {
       billWindow.print();
     }
+  }
+
+  private getStorageKey(): string {
+    const currentUser = this.auth.getCurrentUser();
+    if (currentUser) {
+      return `${this.storageKeyPrefix}:${currentUser}`;
+    }
+
+    const token = this.auth.getToken();
+    return token
+      ? `${this.storageKeyPrefix}:${token}`
+      : `${this.storageKeyPrefix}:guest`;
   }
 }
