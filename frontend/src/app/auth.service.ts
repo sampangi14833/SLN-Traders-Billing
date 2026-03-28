@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenKey = 'token';
   private readonly currentUserKey = 'sln-billing-current-user';
 
-  private baseUrl = 'http://localhost:8080/api/auth';
+  private baseUrl = `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient) {}
 
