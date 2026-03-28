@@ -1,37 +1,50 @@
 package com.billing.auth.service;
 
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
-
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
     public void sendOtp(String email, String otp) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            String url = "https://api.brevo.com/v3/smtp/email";
 
-            helper.setFrom("a65c89001@smtp-brevo.com"); // ✅ IMPORTANT
-            helper.setTo(email);
-            helper.setSubject("OTP Verification - Billing App");
+            RestTemplate restTemplate = new RestTemplate();
 
-            helper.setText(
-                    "<h3>Your OTP is: " + otp + "</h3>" +
-                    "<p>Valid for 5 minutes.</p>",
-                    true // HTML enabled
-            );
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
 
-            mailSender.send(message);
+            Map<String, Object> body = new HashMap<>();
 
-            System.out.println("✅ Email sent successfully");
+            Map<String, String> sender = new HashMap<>();
+            sender.put("email", "sampangisuman26@gmail.com");
+
+            Map<String, String> to = new HashMap<>();
+            to.put("email", email);
+
+            body.put("sender", sender);
+            body.put("to", new Object[]{to});
+            body.put("subject", "OTP Verification");
+            body.put("htmlContent",
+                    "<h3>Your OTP: " + otp + "</h3><p>Valid for 5 minutes</p>");
+
+            HttpEntity<Map<String, Object>> request =
+                    new HttpEntity<>(body, headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(url, request, String.class);
+
+            System.out.println("✅ Email sent: " + response.getStatusCode());
 
         } catch (Exception e) {
             e.printStackTrace();
