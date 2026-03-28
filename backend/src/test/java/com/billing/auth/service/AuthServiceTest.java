@@ -8,6 +8,7 @@ import com.billing.auth.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,15 +33,15 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private JavaMailSender mailSender;
+    @InjectMocks
+EmailService emailService;
 
     private AuthService authService;
 
     @BeforeEach
     void setUp() {
         OtpService otpService = new OtpService(otpRepository);
-        EmailService emailService = new EmailService(mailSender);
+        EmailService emailService = new EmailService();
         JwtUtil jwtUtil = new JwtUtil("test-secret-key-test-secret-key-1234", 60_000L);
         authService = new AuthService(userRepository, otpService, passwordEncoder, jwtUtil, emailService);
     }
