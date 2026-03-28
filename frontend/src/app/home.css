@@ -12,6 +12,7 @@
 
 .home-marquee__track {
   display: inline-flex;
+  align-items: center;
   width: max-content;
   gap: 40px;
   animation: home-marquee-scroll 26s linear infinite;
@@ -19,6 +20,12 @@
 
 .home-marquee__track span {
   white-space: nowrap;
+}
+
+.home-marquee__divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(125, 68, 29, 0.7), transparent);
 }
 
 .home-menu {
@@ -65,5 +72,25 @@
 
   100% {
     transform: translateX(calc(-50% - 20px));
+  }
+}
+
+@media (max-width: 900px) {
+  .home-marquee {
+    font-size: 0.92rem;
+  }
+
+  .home-marquee__track {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-marquee {
+    padding: 8px 0;
+  }
+
+  .home-marquee__divider {
+    width: 32px;
   }
 }

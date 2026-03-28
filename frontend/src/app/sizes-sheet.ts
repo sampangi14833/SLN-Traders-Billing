@@ -322,6 +322,10 @@ export class SizesSheet {
               background: #f8f0e7;
               font-size: 16px;
             }
+            @media (max-width: 900px) {
+              body { padding: 16px; }
+              .bill-grid { grid-template-columns: 1fr; }
+            }
             @media print {
               body { padding: 12px; }
             }

@@ -41,3 +41,120 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# ========================
+
+# GENERAL
+
+# ========================
+
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# ========================
+
+# ANGULAR / FRONTEND
+
+# ========================
+
+# Build output
+
+/dist
+frontend/dist/
+
+/out-tsc
+/bazel-out
+
+# Angular cache
+
+/.angular/cache
+frontend/.angular/
+
+# Node modules
+
+/node_modules
+frontend/node_modules/
+
+# Logs
+
+npm-debug.log*
+yarn-error.log*
+
+# Coverage
+
+/coverage
+
+# ========================
+
+# SPRING BOOT / BACKEND
+
+# ========================
+
+# Build output
+
+/target
+backend/target/
+
+# Compiled classes
+
+*.class
+
+# ========================
+
+# IDEs and EDITORS
+
+# ========================
+
+# IntelliJ
+
+.idea/
+*.iml
+
+# Eclipse / STS
+
+.project
+.classpath
+.settings/
+
+# VS Code (ignore completely for clean repo)
+
+.vscode/
+
+# Other editors
+
+.c9/
+*.launch
+*.sublime-workspace
+
+# ========================
+
+# ENVIRONMENT VARIABLES (IMPORTANT 🔐)
+
+# ========================
+
+.env
+*.env
+
+# ========================
+
+# MISC
+
+# ========================
+
+.sass-cache/
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+**screenshots**/
+
+# ========================
+
+# OPTIONAL TEMP FILES
+
+# ========================
+
+tmp/
+temp/
