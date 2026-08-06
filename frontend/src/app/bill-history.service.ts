@@ -75,21 +75,7 @@ export class BillHistoryService {
     billWindow.focus();
 
     if (print) {
-      let printed = false;
-      const printBill = () => {
-        if (printed) {
-          return;
-        }
-
-        printed = true;
-        billWindow.focus();
-        billWindow.print();
-      };
-
-      billWindow.addEventListener('load', () => billWindow.setTimeout(printBill, 150), {
-        once: true
-      });
-      billWindow.setTimeout(printBill, 900);
+      this.printWhenReady(billWindow);
     }
   }
 
@@ -193,5 +179,50 @@ export class BillHistoryService {
       .slice(0, 80);
 
     return safeName || 'sln-bill';
+  }
+
+  private printWhenReady(billWindow: Window): void {
+    let printed = false;
+    const printBill = () => {
+      if (printed || billWindow.closed) {
+        return;
+      }
+
+      printed = true;
+      billWindow.focus();
+      billWindow.print();
+    };
+    const printAfterAssets = () => {
+      this.waitForBillAssets(billWindow)
+        .then(() => billWindow.setTimeout(printBill, 150))
+        .catch(() => billWindow.setTimeout(printBill, 150));
+    };
+
+    if (billWindow.document.readyState === 'complete') {
+      printAfterAssets();
+    } else {
+      billWindow.addEventListener('load', printAfterAssets, { once: true });
+    }
+
+    billWindow.setTimeout(printBill, 10000);
+  }
+
+  private waitForBillAssets(billWindow: Window): Promise<void> {
+    const billDocument = billWindow.document;
+    const imageReady = Array.from(billDocument.images).map(
+      (image) =>
+        new Promise<void>((resolve) => {
+          if (image.complete) {
+            resolve();
+            return;
+          }
+
+          image.addEventListener('load', () => resolve(), { once: true });
+          image.addEventListener('error', () => resolve(), { once: true });
+        })
+    );
+    const fontReady = billDocument.fonts?.ready.then(() => undefined).catch(() => undefined);
+
+    return Promise.all([...imageReady, fontReady ?? Promise.resolve()]).then(() => undefined);
   }
 }

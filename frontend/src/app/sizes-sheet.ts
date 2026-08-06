@@ -486,7 +486,7 @@ export class SizesSheet {
           <div class="bill-page">
             <header class="brand-row">
               <div class="logo-mark">
-                <img class="bill-logo" src="${iconUrl}" alt="SNL Billing" />
+                <img class="bill-logo" src="${iconUrl}" alt="SNL Billing" loading="eager" decoding="sync" fetchpriority="high" />
               </div>
               <div class="brand-copy">
                 <h1>SNL ENTERPRISES</h1>
@@ -625,11 +625,13 @@ export class SizesSheet {
   }
 
   private getBillIconUrl(): string {
+    const iconPath = `/icon.png?v=${Date.now()}`;
+
     if (typeof window === 'undefined') {
-      return '/icon.png';
+      return iconPath;
     }
 
-    return `${window.location.origin}/icon.png`;
+    return `${window.location.origin}${iconPath}`;
   }
 
   private createRow(size: string, length: number, width: number): StoneRow {
