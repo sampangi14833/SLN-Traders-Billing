@@ -17,11 +17,13 @@
         <article class="recent-bills__item">
           <div>
             <h3>{{ bill.title }}</h3>
-            <p>{{ bill.createdAt }}</p>
+            <p><strong>Bill Date:</strong> {{ formatBillDate(bill.billDate) }}</p>
+            <p><strong>Lorry Number:</strong> {{ bill.lorryNumber || '-' }}</p>
+            <p class="recent-bills__submitted">Submitted: {{ bill.createdAt }}</p>
           </div>
           <div class="recent-bills__actions">
             <button type="button" (click)="viewBill(bill.html)">View</button>
-            <button type="button" (click)="downloadBill(bill.html)">Download</button>
+            <button type="button" (click)="downloadBill(bill)">Download</button>
             <button type="button" (click)="deleteBill(bill.id)">Delete</button>
           </div>
         </article>

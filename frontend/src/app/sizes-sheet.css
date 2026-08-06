@@ -59,9 +59,17 @@
   transform: translateY(-2px);
 }
 
+.sizes-sheet__button--active {
+  background: #5f3a22;
+}
+
 .sizes-sheet__button-link {
   display: inline-block;
   text-decoration: none;
+}
+
+.sizes-sheet__width-selector {
+  margin: 20px 0 18px;
 }
 
 .sizes-sheet__table-wrap {

@@ -9,7 +9,6 @@ import { RouterLink } from '@angular/router';
   selector: 'app-register',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterLink],
-  providers: [AuthService],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })

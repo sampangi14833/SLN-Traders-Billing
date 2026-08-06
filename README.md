@@ -1,94 +1,90 @@
-# 🧾 SLN Traders Billing System
+# SLN Traders Billing
 
-A full-stack billing management system built with Angular and Spring Boot.
+Angular-only billing workspace for SLN Traders.
 
----
+The repository now keeps only the frontend application. Registration, login,
+OTP checks, password reset, sessions, and recent bill history all run inside the
+Angular app. No backend service or database is required.
 
-## 📁 Project Structure
+## Project Structure
 
-* **frontend** → Angular application (UI)
-* **backend** → Spring Boot REST API
+* `frontend` - Angular application
 
----
+## Features
 
-## 🚀 Features
+* Frontend-only login, registration, OTP verification, and password reset
+* Browser-local account storage and JWT-style 12-hour session tokens
+* Size sheet entry with automatic stone counts and area totals
+* Bill generation with print, view, and HTML download support
+* Per-user recent bill history saved in browser storage
 
-* 🔐 User Authentication (Login & Register)
-* 🧾 Billing Management
-* 📊 Size Sheet Management
-* 📜 Recent Bills Tracking
+## OTP Email Setup
 
----
+OTP is sent from the Angular app through EmailJS. Connect the Gmail account in
+the EmailJS dashboard, then fill these values in both environment files:
 
-## 🛠️ Tech Stack
+* `frontend/src/environments/environment.ts`
+* `frontend/src/environments/environment.prod.ts`
 
-* **Frontend:** Angular
-* **Backend:** Spring Boot (Java)
-* **Database:** MySQL *(or H2 for testing)*
-* **Build Tool:** Maven
-
----
-
-## ▶️ How to Run the Project
-
-### 🔹 1. Clone Repository
-
-```bash
-git clone https://github.com/your-username/SLN-Traders-Billing.git
-cd SLN-Traders-Billing
+```ts
+emailjs: {
+  serviceId: 'your_service_id',
+  templateId: 'your_template_id',
+  publicKey: 'your_public_key',
+  fromName: 'SLN Traders Billing'
+}
 ```
 
----
+Your EmailJS template should use these variables:
 
-### 🔹 2. Run Backend (Spring Boot)
+* `to_email`
+* `email`
+* `user_email`
+* `recipient_email`
+* `reply_to`
+* `otp`
+* `purpose`
+* `message`
+* `from_name`
 
-```bash
-cd backend
-.\mvnw.cmd spring-boot:run
-```
+In the EmailJS template settings, set the recipient/to email field to
+`{{to_email}}`. The app also sends the email address under the alias variables
+above so older templates can still work.
 
-* Runs on: **http://localhost:8080**
+If EmailJS is not configured, the app will not show the OTP on screen. Registration
+and password reset require a configured email service.
 
----
+## SMTP and OAuth Note
 
-### 🔹 3. Run Frontend (Angular)
+Do not put Gmail SMTP username/password or app passwords in Angular environment
+files. Frontend code is public in the browser, so those credentials would be
+exposed. Use EmailJS, a serverless function, or a backend API to hold SMTP/OAuth
+secrets safely.
+
+This app has frontend-only JWT-style session tokens for route protection. True
+JWT security requires a backend or trusted verifier because a frontend-only
+signing key can be inspected by users.
+
+## Run Locally
 
 ```bash
 cd frontend
 npm install
-ng serve
+npm start
 ```
 
-* Runs on: **http://localhost:4200**
+The app runs at `http://localhost:4200`.
 
----
+## Build
 
-## 🔗 API Endpoints
+```bash
+cd frontend
+npm run build
+```
 
-### Authentication
+The production build is generated in `frontend/dist`.
 
-* `POST /api/auth/register` → Register user
-* `POST /api/auth/login` → Login user
+## Note
 
----
-
-## ⚠️ Notes
-
-* Ensure Java (JDK 17+) is installed and configured (`JAVA_HOME`)
-* Ensure Node.js and Angular CLI are installed
-* Backend must be running before frontend API calls
-
----
-
-## 📸 Future Improvements
-
-* 🔐 JWT Authentication & Role-based access
-* 🌐 Deploy frontend & backend online
-* 📊 Dashboard & analytics
-* 🧾 PDF bill generation
-
----
-
-## 👨‍💻 Author
-
-Sampangi Suman
+This is a browser-only app. Data is saved in the user's browser storage, so it is
+not shared across browsers or devices.

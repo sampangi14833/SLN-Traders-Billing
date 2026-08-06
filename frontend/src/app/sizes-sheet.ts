@@ -12,6 +12,23 @@ type StoneRow = {
 };
 
 type WidthGroup = 2 | 1.5 | 1 | 9 | 1.25 | 6;
+type SizeGroup = 'large' | 'small';
+
+type WidthOption = {
+  label: string;
+  value: WidthGroup;
+};
+
+type PrintableBillRow = {
+  size: string;
+  stones: number;
+  area: string;
+};
+
+type PrintableBillSection = {
+  label: string;
+  rows: PrintableBillRow[];
+};
 
 @Component({
   selector: 'app-sizes-sheet',
@@ -22,10 +39,23 @@ type WidthGroup = 2 | 1.5 | 1 | 9 | 1.25 | 6;
 })
 export class SizesSheet {
   private readonly billHistory = inject(BillHistoryService);
-  protected activeSizeGroup: 'large' | 'small' | null = null;
+  protected activeSizeGroup: SizeGroup | null = null;
+  protected selectedLargeWidth: WidthGroup = 2;
+  protected selectedSmallWidth: WidthGroup = 9;
   protected showGeneratedBill = false;
   protected billName = '';
+  protected billDate = this.getTodayDateValue();
   protected lorryNumber = '';
+  protected readonly largeWidthOptions: WidthOption[] = [
+    { label: '2 Width', value: 2 },
+    { label: '1.5 Width', value: 1.5 },
+    { label: '1 Width', value: 1 }
+  ];
+  protected readonly smallWidthOptions: WidthOption[] = [
+    { label: '9 Width', value: 9 },
+    { label: '1.25 Width', value: 1.25 },
+    { label: '6 Width', value: 6 }
+  ];
   protected readonly largeRows: StoneRow[] = [
     this.createRow('3 X 2', 3, 2),
     this.createRow('3.5 X 2', 3.5, 2),
@@ -85,7 +115,7 @@ export class SizesSheet {
     this.createRow('7 X 1.25', 7, 1.25),
     this.createRow('7.5 X 1.25', 7.5, 1.25),
     this.createRow('8 X 1.25', 8, 1.25),
-        this.createRow('3 X 6', 3, 6),
+    this.createRow('3 X 6', 3, 6),
     this.createRow('3.5 X 6', 3.5, 6),
     this.createRow('4 X 6', 4, 6),
     this.createRow('4.5 X 6', 4.5, 6),
@@ -158,6 +188,39 @@ export class SizesSheet {
     return this.largeRows.filter((row) => row.width === width);
   }
 
+  protected getActiveWidthOptions(): WidthOption[] {
+    return this.activeSizeGroup === 'small' ? this.smallWidthOptions : this.largeWidthOptions;
+  }
+
+  protected getActiveWidth(): WidthGroup {
+    return this.activeSizeGroup === 'small' ? this.selectedSmallWidth : this.selectedLargeWidth;
+  }
+
+  protected getActiveRows(): StoneRow[] {
+    return this.getRowsForWidth(this.getActiveWidth());
+  }
+
+  protected getActiveWidthTotalStones(): number {
+    return this.getWidthGroupTotalStones(this.getActiveWidth());
+  }
+
+  protected getActiveWidthTotalArea(): number {
+    return this.getWidthGroupTotalArea(this.getActiveWidth());
+  }
+
+  protected getActiveSizeGroupLabel(): string {
+    return this.activeSizeGroup === 'small' ? 'Small Sizes' : 'Large Sizes';
+  }
+
+  protected selectWidth(width: WidthGroup): void {
+    if (this.activeSizeGroup === 'small') {
+      this.selectedSmallWidth = width;
+      return;
+    }
+
+    this.selectedLargeWidth = width;
+  }
+
   protected getWidthGroupTotalStones(width: WidthGroup): number {
     return this.getRowsForWidth(width).reduce((sum, row) => sum + this.getStoneCount(row), 0);
   }
@@ -193,58 +256,32 @@ export class SizesSheet {
   protected generateBill(): void {
     this.activeSizeGroup = null;
     this.showGeneratedBill = true;
+
+    if (!this.billDate.trim()) {
+      this.billDate = this.getTodayDateValue();
+    }
   }
 
   protected submitBill(): void {
     const html = this.buildBillHtml();
-    this.billHistory.saveBill(html, this.billName.trim());
+    this.billHistory.saveBill(html, {
+      title: this.billName,
+      billDate: this.billDate,
+      lorryNumber: this.lorryNumber
+    });
     this.billHistory.openBill(html, true);
   }
 
   private buildBillHtml(): string {
-    const sections: WidthGroup[] = [2, 1.5, 1, 9, 1.25, 6];
-    const tablesMarkup = sections
-      .map((width) => {
-        const label = `${width} Width`;
-        const rows = this.getRowsForWidth(width)
-          .map((row) => {
-            const expression = row.stoneExpression.trim() || '-';
-            const stones = this.getStoneCount(row);
-            const area = this.getTotalArea(row).toFixed(2);
-
-            return `
-              <tr>
-                <td>${row.size}</td>
-                <td>${expression}</td>
-                <td>${stones}</td>
-                <td>${area}</td>
-              </tr>
-            `;
-          })
-          .join('');
-
-        return `
-          <section class="bill-grid__item">
-            <h2>${label}</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Size</th>
-                  <th>No.of Stones</th>
-                  <th>Stones Count</th>
-                  <th>Total Area</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
-            <div class="subtotal">
-              <p><strong>Total Stones:</strong> ${this.getWidthGroupTotalStones(width)}</p>
-              <p><strong>Total Area:</strong> ${this.getWidthGroupTotalArea(width).toFixed(2)}</p>
-            </div>
-          </section>
-        `;
-      })
-      .join('');
+    const sections = this.getPrintableBillSections();
+    const maximumRows = Math.max(...sections.map((section) => section.rows.length), 0);
+    const billDateLabel = this.formatBillDate(this.billDate);
+    const billName = this.escapeHtml(this.billName.trim() || 'Untitled Bill');
+    const lorryNumber = this.escapeHtml(this.lorryNumber.trim() || '-');
+    const iconUrl = this.escapeHtml(this.getBillIconUrl());
+    const printableGrid = sections.length
+      ? this.buildPrintableGridMarkup(sections, maximumRows)
+      : '<p class="empty-state">No stone entries were added for this bill.</p>';
 
     return `
       <!doctype html>
@@ -254,96 +291,345 @@ export class SizesSheet {
           <title>SLN Billing Bill</title>
           <style>
             * { box-sizing: border-box; }
+            :root {
+              --ink: #9b2f5d;
+              --line: #9b2f5d;
+              --paper: #fbfffe;
+            }
             body {
               margin: 0;
-              padding: 24px;
-              font-family: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
-              color: #2f2419;
+              padding: clamp(4px, 1.6vw, 18px);
+              background: #eef5f3;
+              color: var(--ink);
+              font-family: "Arial Narrow", Arial, sans-serif;
+            }
+            .bill-page {
+              width: min(1120px, calc(100vw - 12px));
+              margin: 0 auto;
+              padding: clamp(6px, 1.6vw, 18px);
+              background: var(--paper);
+            }
+            .brand-row {
+              display: grid;
+              grid-template-columns: clamp(74px, 13vw, 142px) minmax(0, 1fr) clamp(104px, 20vw, 220px);
+              gap: clamp(4px, 1vw, 12px);
+              align-items: start;
+            }
+            .logo-mark {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: clamp(46px, 7vw, 78px);
+              overflow: hidden;
+            }
+            .bill-logo {
+              width: 100%;
+              height: 100%;
+              object-fit: contain;
+              object-position: center;
+            }
+            .brand-copy {
+              text-align: center;
+              min-width: 0;
             }
             h1 {
-              margin: 0 0 8px;
-              font-size: 28px;
+              margin: 0;
+              font-size: clamp(13px, 3vw, 36px);
+              line-height: 1;
+              letter-spacing: 0.04em;
+              font-weight: 900;
+              white-space: nowrap;
             }
-            .bill-name {
-              margin: 0 0 16px;
-              font-size: 18px;
-              color: #7d441d;
-              font-weight: 700;
+            .address,
+            .prop {
+              margin: 4px 0 0;
+              font-size: clamp(8px, 1.45vw, 16px);
+              font-weight: 800;
+              letter-spacing: 0;
             }
-            .bill-meta {
-              margin: 0 0 10px;
-              font-size: 16px;
-              color: #6f5a45;
-              font-weight: 700;
+            .prop {
+              font-size: clamp(7px, 1.25vw, 14px);
             }
-            .intro {
-              margin: 0 0 20px;
-              color: #6f5a45;
+            .contact {
+              margin-top: 4px;
+              font-size: clamp(10px, 1.8vw, 20px);
+              line-height: 1.25;
+              font-weight: 900;
+              min-width: 0;
             }
-            .bill-grid {
+            .bill-meta-row {
               display: grid;
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 18px;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: clamp(4px, 1vw, 12px);
+              margin: clamp(7px, 1.25vw, 14px) 0 clamp(4px, 0.75vw, 8px);
+              font-size: clamp(9px, 1.6vw, 18px);
+              font-weight: 900;
             }
-            .bill-grid__item {
-              border: 1px solid #d9c5b0;
-              border-radius: 12px;
-              padding: 14px;
-              break-inside: avoid;
+            .bill-meta-row span:nth-child(2) {
+              text-align: center;
             }
-            .bill-grid__item h2 {
-              margin: 0 0 10px;
-              font-size: 20px;
-              color: #7d441d;
+            .bill-meta-row span:last-child {
+              text-align: right;
             }
             table {
               width: 100%;
               border-collapse: collapse;
-              font-size: 12px;
+              table-layout: fixed;
             }
             th, td {
-              padding: 8px;
-              border: 1px solid #e4d6c7;
-              text-align: left;
+              border: 2px solid var(--line);
+              color: var(--ink);
+              overflow: hidden;
+              white-space: nowrap;
+              line-height: 1;
             }
             th {
-              background: #f7efe6;
+              height: clamp(15px, 2.5vw, 28px);
+              padding: clamp(1px, 0.3vw, 3px) clamp(1px, 0.4vw, 4px);
+              font-size: clamp(5.8px, 1.25vw, 14px);
+              font-weight: 900;
+              text-align: center;
+              text-transform: uppercase;
             }
-            .subtotal, .grand-totals {
-              margin-top: 12px;
+            td {
+              height: clamp(16px, 2.75vw, 31px);
+              padding: clamp(1px, 0.3vw, 3px) clamp(1px, 0.45vw, 5px);
+              font-size: clamp(5.8px, 1.35vw, 15px);
+              font-weight: 900;
+              vertical-align: middle;
             }
-            .subtotal p, .grand-totals p {
-              margin: 4px 0;
+            .size-cell {
+              text-align: left;
             }
-            .grand-totals {
-              margin-top: 24px;
-              padding: 16px;
-              border-radius: 12px;
-              background: #f8f0e7;
-              font-size: 16px;
+            .number-cell {
+              text-align: center;
+              font-size: clamp(5.6px, 1.25vw, 14px);
+            }
+            .empty-cell {
+              color: transparent;
+            }
+            .total-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: clamp(4px, 1vw, 12px);
+              margin-top: clamp(8px, 1.6vw, 18px);
+              padding-top: clamp(4px, 0.75vw, 8px);
+              border-top: 2px solid var(--line);
+              font-size: clamp(9px, 1.6vw, 18px);
+              font-weight: 900;
+            }
+            .total-row span:nth-child(2) {
+              text-align: center;
+            }
+            .total-row span:last-child {
+              text-align: right;
+            }
+            .empty-state {
+              margin: 40px 0;
+              padding: 24px;
+              border: 2px solid var(--line);
+              font-size: 22px;
+              font-weight: 900;
+              text-align: center;
             }
             @media (max-width: 900px) {
-              body { padding: 16px; }
-              .bill-grid { grid-template-columns: 1fr; }
+              .print-grid-wrap {
+                overflow: hidden;
+              }
+              .address {
+                display: none;
+              }
+            }
+            @media (max-width: 520px) {
+              .brand-row {
+                grid-template-columns: clamp(64px, 20vw, 86px) minmax(0, 1fr) clamp(82px, 25vw, 108px);
+              }
+              .logo-mark {
+                height: clamp(36px, 11vw, 48px);
+              }
+              h1 {
+                font-size: clamp(10px, 2.75vw, 13px);
+                line-height: 0.95;
+                white-space: normal;
+                overflow-wrap: anywhere;
+              }
+              .prop {
+                font-size: clamp(6px, 1.9vw, 8px);
+              }
+              .contact {
+                font-size: clamp(8px, 2.35vw, 10px);
+                line-height: 1.1;
+                text-align: right;
+                overflow-wrap: anywhere;
+              }
             }
             @media print {
-              body { padding: 12px; }
+              @page {
+                size: A4 landscape;
+                margin: 8mm;
+              }
+              body {
+                padding: 0;
+                background: #fff;
+              }
+              .bill-page {
+                width: 100%;
+                padding: 0;
+              }
+              th, td {
+                border-width: 1.5px;
+              }
             }
           </style>
         </head>
         <body>
-          <h1>SNL Enterprises</h1>
-          <p class="bill-name"><strong>Bill Name:</strong> ${this.billName.trim() || 'Untitled Bill'}</p>
-          <p class="bill-meta"><strong>Lorry Number:</strong> ${this.lorryNumber.trim() || '-'}</p>
-          <p class="intro">Widths 2, 1.5, 1, 9, 1.25 and 6 are shown below.</p>
-          <div class="bill-grid">${tablesMarkup}</div>
-          <div class="grand-totals">
-            <p><strong>Total Stones:</strong> ${this.getPdfTotalStones()}</p>
-            <p><strong>Total Area:</strong> ${this.getPdfTotalArea().toFixed(2)}</p>
+          <div class="bill-page">
+            <header class="brand-row">
+              <div class="logo-mark">
+                <img class="bill-logo" src="${iconUrl}" alt="SNL Billing" />
+              </div>
+              <div class="brand-copy">
+                <h1>SNL ENTERPRISES</h1>
+                <p class="address">Sreenivasulu and Nagalakshumamma Enterprises</p>
+                <p class="prop">Bill Name: ${billName}</p>
+              </div>
+              <div class="contact">
+                <div>CELL : 9849255291</div>
+              </div>
+            </header>
+            <div class="bill-meta-row">
+              <span>Lorry No : ${lorryNumber}</span>
+              <span></span>
+              <span>Date : ${billDateLabel}</span>
+            </div>
+            <div class="print-grid-wrap">${printableGrid}</div>
+            <div class="total-row">
+              <span>Total Stones : ${this.getPrintableTotalStones()}</span>
+              <span>Total Area : ${this.getPrintableTotalArea().toFixed(2)}</span>
+              <span></span>
+            </div>
           </div>
         </body>
       </html>
     `;
+  }
+
+  private getPrintableBillSections(): PrintableBillSection[] {
+    const widths: WidthGroup[] = [2, 1.5, 1, 1.25, 9, 6];
+
+    return widths
+      .map((width) => ({
+        label: this.getPrintableWidthLabel(width),
+        rows: this.getRowsForWidth(width)
+          .filter((row) => this.getStoneCount(row) >= 1)
+          .map((row) => ({
+            size: this.getPrintableSize(row),
+            stones: this.getStoneCount(row),
+            area: this.getTotalArea(row).toFixed(2)
+          }))
+      }))
+      .filter((section) => section.rows.length > 0);
+  }
+
+  private buildPrintableGridMarkup(sections: PrintableBillSection[], maximumRows: number): string {
+    const sectionWidth = 100 / sections.length;
+    const sizeColumnWidth = sectionWidth * 0.45;
+    const quantityColumnWidth = sectionWidth * 0.2;
+    const areaColumnWidth = sectionWidth * 0.35;
+    const columnGroup = sections
+      .map(
+        () => `
+          <col class="size-col" style="width: ${sizeColumnWidth.toFixed(3)}%" />
+          <col class="qty-col" style="width: ${quantityColumnWidth.toFixed(3)}%" />
+          <col class="area-col" style="width: ${areaColumnWidth.toFixed(3)}%" />
+        `
+      )
+      .join('');
+    const headerCells = sections
+      .map((section) => `<th colspan="3">${this.escapeHtml(section.label)}</th>`)
+      .join('');
+    const detailHeaderCells = sections
+      .map(() => '<th>Size</th><th>Qty</th><th>Area</th>')
+      .join('');
+    const bodyRows = Array.from({ length: maximumRows }, (_, rowIndex) => {
+      const cells = sections
+        .map((section) => {
+          const row = section.rows[rowIndex];
+
+          if (!row) {
+            return '<td class="empty-cell">&nbsp;</td><td class="empty-cell">&nbsp;</td><td class="empty-cell">&nbsp;</td>';
+          }
+
+          return `
+            <td class="size-cell">${this.escapeHtml(row.size)}</td>
+            <td class="number-cell">${row.stones}</td>
+            <td class="number-cell">${row.area}</td>
+          `;
+        })
+        .join('');
+
+      return `<tr>${cells}</tr>`;
+    }).join('');
+
+    return `
+      <table class="print-grid">
+        <colgroup>${columnGroup}</colgroup>
+        <thead>
+          <tr>${headerCells}</tr>
+          <tr>${detailHeaderCells}</tr>
+        </thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    `;
+  }
+
+  private getPrintableTotalStones(): number {
+    return [...this.largeRows, ...this.smallRows].reduce(
+      (sum, row) => sum + this.getStoneCount(row),
+      0
+    );
+  }
+
+  private getPrintableTotalArea(): number {
+    return [...this.largeRows, ...this.smallRows].reduce(
+      (sum, row) => sum + this.getTotalArea(row),
+      0
+    );
+  }
+
+  private getPrintableWidthLabel(width: WidthGroup): string {
+    return `${this.formatCompactMeasurement(width)} Width`;
+  }
+
+  private getPrintableSize(row: StoneRow): string {
+    return `${this.formatCompactMeasurement(row.length)}X${this.formatCompactMeasurement(row.width)}`;
+  }
+
+  private formatCompactMeasurement(value: number): string {
+    const whole = Math.floor(value);
+    const fraction = Number((value - whole).toFixed(2));
+
+    if (fraction === 0.5) {
+      return `${whole}.5`;
+    }
+
+    if (fraction === 0.25) {
+      return `${whole}.25`;
+    }
+
+    if (fraction === 0.75) {
+      return `${whole}.75`;
+    }
+
+    return `${value}`;
+  }
+
+  private getBillIconUrl(): string {
+    if (typeof window === 'undefined') {
+      return '/icon.png';
+    }
+
+    return `${window.location.origin}/icon.png`;
   }
 
   private createRow(size: string, length: number, width: number): StoneRow {
@@ -353,5 +639,45 @@ export class SizesSheet {
       width,
       stoneExpression: ''
     };
+  }
+
+  private escapeHtml(value: string): string {
+    return value.replace(/[&<>"']/g, (character) => {
+      const entities: Record<string, string> = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+
+      return entities[character];
+    });
+  }
+
+  private getTodayDateValue(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = `${now.getMonth() + 1}`.padStart(2, '0');
+    const day = `${now.getDate()}`.padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatBillDate(dateValue: string): string {
+    if (!dateValue.trim()) {
+      return '-';
+    }
+
+    const [year, month, day] = dateValue.split('-').map((value) => Number(value));
+    if (!year || !month || !day) {
+      return dateValue;
+    }
+
+    return new Intl.DateTimeFormat('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).format(new Date(year, month - 1, day));
   }
 }

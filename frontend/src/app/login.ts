@@ -9,7 +9,6 @@ import { RouterLink } from '@angular/router';
   selector: 'app-login',
   standalone: true,
   imports: [FormsModule, CommonModule, RouterLink],
-  providers: [AuthService],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })

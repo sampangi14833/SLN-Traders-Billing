@@ -8,11 +8,21 @@
     </p>
   </header>
   <div class="sizes-sheet__toolbar">
-    <a class="sizes-sheet__button sizes-sheet__button-link" routerLink="/home">Home</a>
-    <button class="sizes-sheet__button" type="button" (click)="openLargeSize()">
+    <a class="sizes-sheet__button sizes-sheet__button-link text-center" routerLink="/home">Home</a>
+    <button
+      class="sizes-sheet__button"
+      type="button"
+      [class.sizes-sheet__button--active]="activeSizeGroup === 'large'"
+      (click)="openLargeSize()"
+    >
       Large Sizes
     </button>
-    <button class="sizes-sheet__button" type="button" (click)="openSmallSize()">
+    <button
+      class="sizes-sheet__button"
+      type="button"
+      [class.sizes-sheet__button--active]="activeSizeGroup === 'small'"
+      (click)="openSmallSize()"
+    >
       Small Sizes
     </button>
     <button class="sizes-sheet__button" type="button" (click)="generateBill()">
@@ -20,11 +30,29 @@
     </button>
   </div>
 
-  @if (activeSizeGroup === 'large') {
+  @if (activeSizeGroup) {
     <p class="sizes-sheet__copy">
-      Enter stone groups like <strong>1+5+7+10</strong>. The page will total them
-      automatically and fill the stone count for that large size.
+      Enter stone groups like <strong>1+5+7+10</strong>. Choose a width under
+      {{ getActiveSizeGroupLabel() }} to enter only that set of sizes.
     </p>
+
+    <div class="sizes-sheet__width-selector" aria-label="Width selector">
+      <span class="sizes-sheet__label">{{ getActiveSizeGroupLabel() }} Width</span>
+      <div class="sizes-sheet__toolbar sizes-sheet__width-options">
+        @for (option of getActiveWidthOptions(); track option.value) {
+          <button
+            class="sizes-sheet__button"
+            type="button"
+            [class.sizes-sheet__button--active]="getActiveWidth() === option.value"
+            [attr.aria-pressed]="getActiveWidth() === option.value"
+            (click)="selectWidth(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
     <div class="sizes-sheet__table-wrap">
       <table class="sizes-sheet__table">
         <thead>
@@ -36,7 +64,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (row of largeRows; track row.size) {
+          @for (row of getActiveRows(); track row.size) {
             <tr>
               <td data-label="Size">{{ row.size }}</td>
               <td data-label="No. of Stones">
@@ -54,50 +82,20 @@
         </tbody>
       </table>
     </div>
-    <div class="sizes-sheet__totals">
-      <p><strong>Total Stones:</strong> {{ getLargeTotalStones() }}</p>
-      <p><strong>Total Area:</strong> {{ getLargeTotalArea() | number: '1.0-2' }}</p>
-    </div>
-  }
 
-  @if (activeSizeGroup === 'small') {
-    <p class="sizes-sheet__copy">
-      Enter stone groups like <strong>1+5+7+10</strong>. The page will total them
-      automatically and fill the stone count for that small size.
-    </p>
-    <div class="sizes-sheet__table-wrap">
-      <table class="sizes-sheet__table">
-        <thead>
-          <tr>
-            <th>Size</th>
-            <th>No.of Stones</th>
-            <th>Stones Count</th>
-            <th>Total Area</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of smallRows; track row.size) {
-            <tr>
-              <td data-label="Size">{{ row.size }}</td>
-              <td data-label="No. of Stones">
-                <input
-                  class="sizes-sheet__input"
-                  type="text"
-                  [(ngModel)]="row.stoneExpression"
-                  placeholder="Enter the stones"
-                />
-              </td>
-              <td data-label="Stones Count">{{ getStoneCount(row) }}</td>
-              <td data-label="Total Area">{{ getTotalArea(row) | number: '1.0-2' }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
-    </div>
     <div class="sizes-sheet__totals">
-      <p><strong>Total Stones:</strong> {{ getSmallTotalStones() }}</p>
-      <p><strong>Total Area:</strong> {{ getSmallTotalArea() | number: '1.0-2' }}</p>
+      <p><strong>{{ getActiveWidth() }} Width Stones:</strong> {{ getActiveWidthTotalStones() }}</p>
+      <p>
+        <strong>{{ getActiveWidth() }} Width Area:</strong>
+        {{ getActiveWidthTotalArea() | number: '1.0-2' }}
+      </p>
+      @if (activeSizeGroup === 'large') {
+        <p><strong>Large Total Stones:</strong> {{ getLargeTotalStones() }}</p>
+        <p><strong>Large Total Area:</strong> {{ getLargeTotalArea() | number: '1.0-2' }}</p>
+      } @else {
+        <p><strong>Small Total Stones:</strong> {{ getSmallTotalStones() }}</p>
+        <p><strong>Small Total Area:</strong> {{ getSmallTotalArea() | number: '1.0-2' }}</p>
+      }
     </div>
   }
 
@@ -124,6 +122,16 @@
           type="text"
           [(ngModel)]="lorryNumber"
           placeholder="Enter lorry number"
+        />
+      </div>
+
+      <div class="sizes-sheet__bill-name">
+        <label class="sizes-sheet__label" for="bill-date">Bill Date</label>
+        <input
+          id="bill-date"
+          class="sizes-sheet__input"
+          type="date"
+          [(ngModel)]="billDate"
         />
       </div>
 
