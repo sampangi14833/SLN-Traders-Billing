@@ -82,7 +82,21 @@ cd frontend
 npm run build
 ```
 
-The production build is generated in `frontend/dist`.
+The production build is generated in `frontend/dist/SLN-Billing/browser`.
+
+## Deploy On Netlify
+
+This repo is configured for Netlify with `netlify.toml` at the repository root.
+After connecting the GitHub repository to Netlify, Netlify should use these
+settings automatically:
+
+* Base directory: `frontend`
+* Build command: `npm run build`
+* Publish directory: `dist/SLN-Billing/browser`
+* Node version: `22.12.0`
+
+The SPA redirect rule is included so routes like `/login`, `/register`, and
+`/recent-bills` load correctly after refresh.
 
 ## Note
 
